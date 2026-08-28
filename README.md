@@ -1,35 +1,66 @@
- Computer-Vision-Neural-Network-Algorithm----Handwritten-Digit-Recognizer
+![Handwritten digit recognizer banner](docs/banner.png)
 
-This is a program that I was required to write during a summer class I took at UW Madison (CS 540 – Introduction to Artificial Intelligence)
+# Backprop Digit Recognizer
 
-The assignment required us to write a neural network that takes an input file of binary data containing a large series of black and white handwritten digits.
-The original assignment asked that our program recognize digits between 0-2, and for extra credit we could modify the program to interpret digits 0-9.
-This is my (successful) attempt at the extra credit.
+*A one-hidden-layer neural network, written in Java from scratch, that reads handwritten digits.*
 
-The main method of this program is in HW4.java (technically HW4.class within the bin folder). The usage format from terminal is as follows:
-usage: java HW4 (numberOfHiddenNodes) (learningRate) (maxEpoch) (trainFile) (testFile)
+I wrote this in the summer of 2016 for CS 540 (Introduction to Artificial Intelligence) at UW-Madison. The assignment was a neural network that reads a file of black-and-white handwritten digits and classifies each one. The required version only had to tell 0, 1, and 2 apart. Recognizing all ten digits, 0 through 9, was the extra credit. This is my successful attempt at the extra credit.
 
-The trainFile is a text file containing binary data of a series of handwritten characters. Each line corresponds to 1 character and 
-is a sequence of 256 bits, where each bit is separated by a space, " ", character.. and followed by a classification. Following
-each sequence of bits is another series of binary data, where the index of each position corresponds to the number that the data
-represents. 
+There is no library doing the work here. Back-propagation lives in `src/NNImpl.java` and the sigmoid activation in `src/Node.java`.
 
-For example:
+## Usage
+
+The main method is in `HW4.java` (technically `HW4.class`, in the `bin` folder). From a terminal:
+
+```
+java HW4 (numberOfHiddenNodes) (learningRate) (maxEpoch) (trainFile) (testFile)
+```
+
+For example, training on all ten digits:
+
+```
+java HW4 30 0.1 100 train2.txt test2.txt
+```
+
+The program prints every misclassified test instance, then the total number of instances and how many it got right.
+
+### Parameters
+
+- **numberOfHiddenNodes** — how many nodes are in the hidden layer. Raising this generally makes classifications more accurate, since there are more possible combinations of weights between the layers.
+- **learningRate** — how far the weights move on each update. It must be greater than 0 and no larger than 1.
+- **maxEpoch** — how many times to run the training set. On each epoch the training set uses a back-propagation algorithm to set the weights between layers. The activation function is the sigmoid, which worked better for me than a step function.
+- **trainFile** — the labelled data the network learns from.
+- **testFile** — the labelled data used only to check the answers.
+
+## Data format
+
+The train and test files are plain text. Each line is one character: 256 bits, separated by spaces, for a 16x16 image, followed by a one-hot classification.
+
+For example, one line of a train file looks like:
+
+```
 (characterBits) 0 1 0
-would be 1 line in the trainFile. The 0 1 0 means that <characterBits> correspond to the handwritten digit "1". This practice is an example
-of trained learning.
+```
 
-The testFile is identical in structure, but the program only uses the identifier to see if it correctly classified each digit.
+The `0 1 0` means those bits are the handwritten digit "1". The test file has the same shape, but the program uses the label only to check whether it classified the digit correctly.
 
+Four data files are included:
 
-Increasing the number of (numberOfHiddenNodes) will generally make classifications more accurate (as there will be more possible combinations of 
-weights between layers). 
+- `train1.txt` and `test1.txt` — three classes, digits 0 through 2, for the base assignment.
+- `train2.txt` and `test2.txt` — ten classes, digits 0 through 9, for the extra credit.
 
-The (maxEpoch) parameter specifies the number of times to run the training set (on each epoch the training set uses a back-propogation algorithm
-to set the weights between layers). The algorithm also uses the sigmoid function as the activation function, as I found this to be more successful
-than a step function approach. 
+`view.py` prints one digit as ASCII art so you can see what the network sees:
 
-The (learningRate) parameter adjusts the rate at which weights are modified during training. 
+```
+python view.py --file=train1.txt --index=10
+```
 
-Lastly, I'd like to thank the folks at UC Irvine for providing the extensive training set text files that I used in this program. The
-files can be reached at https://archive.ics.uci.edu/ml/datasets/Semeion+Handwritten+Digit.
+## Layout
+
+- `src/` — `HW4.java` (entry point and file parsing), `NNImpl.java` (the network, training, and back-propagation), `Node.java` (a unit and its sigmoid activation), `NodeWeightPair.java`, `Instance.java`.
+- `bin/` — compiled classes.
+- `view.py` — the digit viewer.
+
+## Credit
+
+Thanks to the folks at UC Irvine for the training set. The data is derived from the [Semeion handwritten digit data set](https://archive.ics.uci.edu/ml/datasets/Semeion+Handwritten+Digit).
